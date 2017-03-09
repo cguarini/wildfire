@@ -6,6 +6,9 @@
 #include <stdlib.h>
 
 #include <getopt.h> //processing for "-fN" command line args
+#include "display.h"//Used to display the grid on the terminal
+
+
 
 //defines
 //DEFUALTS
@@ -26,6 +29,7 @@
 #define EMPTY_DISPLAY ' '///Symbol for empty cell
 #define FIRE_DISPLAY '*' ///Symbol for fire
 #define BURNT_DISPLAY '.'///Symbol for burnt out cell
+#define ERROR_DISPLAY 'N'///Symbol if grid was incorrectly populated
 //Command line arguments with defaults
 int burning=DEFUALT_BURN;      //percentage of population that is initially burning, modified by -bN argument
 int poc=DEFAULT_PROB_CATCH;    //Probability of catching fire, chance for each tree to catch fire, modified by -cN argument
@@ -246,6 +250,9 @@ void printGrid(char grid[size][size]){
       if(grid[i][j]==FIRE1 || grid[i][j]==FIRE2){//Cell on fire
         printf(FIRE_DISPLAY);
       }
+      else{
+        printf(ERROR_DISPLAY);//shouldn't be reached
+      }
     }
     printf("\n");//newline after every row
   }
@@ -259,6 +266,41 @@ void printInfo(void){
   printf("size %d, pCatch %d%, density %d%, pBurning %d%, pNeighbor %d%\n",size,poc,occ,poc,neigh);
   printf("cycle %d, changes %d, cumulative changes %d.\n",cycle,changes,cumulativeChanges);
 }
+
+/**Displays the simulation using the code given in display.c and display.h
+** @param: grid - grid to display to the terminal
+**/
+void displayOverlay(char grid[size][size]){
+  clear();//clear the terminal
+  set_cur_pos(0,0);//set cursor to top left position
+  for(int i=0;i<size;i++){//loop through grid from top to bottom
+    for(int j=0;j<size;j++){//left to right
+      set_cur_pos(i,j);//set cursor to position in grid
+      if(grid[i][j]==EMPTY){//Empty cell
+        put(EMPTY_DISPLAY);
+      }
+      if(grid[i][j]==TREE){//Tree
+        put(TREE_DISPLAY);
+      }
+      if(grid[i][j]==FIRE1 || grid[i][j]==FIRE2){//Burning
+        put(FIRE_DISPLAY);
+      }
+      if(grid[i][j]==BURNT){//Burnt cell
+        put(BURNT_DISPLAY);
+      }
+      else{
+        PUT(ERROR_DISPLAY);//Shouldn't be reached
+      }
+    }
+
+  }
+}
+
+
+
+
+
+
 
 
 
