@@ -295,8 +295,28 @@ void displayOverlay(char grid[size][size]){
 
   }
 }
-
-
+/**Prints the usage message, for use when the user enters the H argument
+*/
+static void usage() {
+  fprintf(stderr, "usage: wildfire [options]\n ");
+  fprintf(stderr, "By default, the simulation runs in overlay display mode.\n");
+  fprintf(stderr, "The -pN option makes the simulation run in print mode for up to N cycles.\n\n");
+  fprintf(stderr, "Simulation Configuration Options:\n");
+  fprintf(stderr, "\t-H # View simulation options and quit.\n");
+  fprintf(stderr, "\t-bN # proportion of trees that are already burning. 0 < N < 101.\n");
+  fprintf(stderr, "\t-cN # probability that a tree will catch fire. 0 < N < 101.\n");
+  fprintf(stderr, "\t-dN # density/proportion of trees in the grid. 0 < N < 101.\n");
+  fprintf(stderr, "\t-nN # proportion of neighbors that influence a tree catching fire. -1 < N < 101.\n");
+  fprintf(stderr, "\t-pN # number of cycles to print before quitting. -1 < N < ...\n");
+  fprintf(stderr, "\t-sN # simulation grid size. 4 < N < 41.\n");
+}
+/**Main function of wildfire. This will have the main loop of the simulation,
+** which based on the arguments will determine initial conditions, and output
+** conditions.
+**/
+int main(int argc, char * argv[]){
+  
+}
 
 
 
