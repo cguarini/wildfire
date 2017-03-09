@@ -35,6 +35,10 @@ int print=DEFAULT_PRINT_COUNT; //Toggles print mode, if >0, simulation will prin
 int size=DEFAULT_SIZE;         //size of the simulation grid's rows and columns. Grid will be size*size
 int damp=0;                    //Dampness factor reduces the likelyhood a tree will catch fire, initializes to 0 (off)
 int strike=0;                  //Toggles lightning strikes, which will set random trees on fire, initializes to 0 (off)
+//Global Variables
+int Cycle=0;//Cycle the simulation is on
+int changes=0;//Changes this cycle
+int cumulativeChanges=0;//Total changes
 ///////////////////////////////////////////////
 
 
@@ -98,6 +102,7 @@ void initialize(char grid[size][size]){
 **@returns: Returns 1 if any fires left, 0 if all fires are out.
 */
 int advance(char grid[size][size]{
+  changes=0;//reset changes
   char copy[size-1][size-1];//Copy of the simulation map
   memcpy(copy,grid,size*size);//create the copy
   int onFire=0;//Number of fires in the grid, if 0 triggers end of simulation.
@@ -105,9 +110,14 @@ int advance(char grid[size][size]{
     for(int j=0;j<size;j++){//Loop through every column, left to right
       int trees=0;//Number of adjacent trees
       int fires=0;//Number of adjacent fires
-      if(copy[i][j]>1&&copy[i][j]<4){//Cell is burning but not burnt out
+      if(copy[i][j]>TREE && copy[i][j]<BURNT){//Cell is burning but not burnt out
         grid[i][j]++;//increment the fire a cycle
         onFire++;
+        if(grid[i][j]==BURNT){//Went from fire to burnt
+          //Increment change counters
+          changes++;
+          cumulativeChanges++;
+        }
       }
       else if(copy[i][j]==1){//Cell holds a tree that is not on fire
         
@@ -200,15 +210,18 @@ int advance(char grid[size][size]{
         if(fireProportion>neigh && catchChance<poc){
           grid[i][j]++;//Tree catches fire
           onFire++;//Add fire to the counter that determines end of game
+          //increment change counters
+          changes++;
+          cumulativeChanges++;
         }
       }
     }
   }
   //end of loops
-  if(onFire>0){
+  if(onFire>0){//Any fires left?
     return 1;
   }
-  return 0;
+  return 0;//end of simulation
 }
 
 
@@ -239,15 +252,13 @@ void printGrid(char grid[size][size]){
   //Grid printed
 }
 
-
-
-
-
-
-
-
-
-
+/**Prints the information string that contains the global variables and cycle
+** numbers
+**/
+void printInfo(void){
+  printf("size %d, pCatch %d%, density %d%, pBurning %d%, pNeighbor %d%\n",size,poc,occ,poc,neigh);
+  printf("cycle %d, changes %d, cumulative changes %d.\n",cycle,changes,cumulativeChanges);
+}
 
 
 
