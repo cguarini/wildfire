@@ -23,7 +23,7 @@
 #define EMPTY 0  ///Symbol for an empty cell
 #define FIRE1 2  ///Symbol for fire in first cycle
 #define FIRE2 3  ///Symbol for fire in second cycle
-#define BURNT 4  ///Symbol for burnt out cell
+#define BURNT 5  ///Symbol for burnt out cell
 //Symbols used for display purposes
 #define TREE_DISPLAY 'Y' ///Symbol for noninflamed tree
 #define EMPTY_DISPLAY ' '///Symbol for empty cell
@@ -31,18 +31,18 @@
 #define BURNT_DISPLAY '.'///Symbol for burnt out cell
 #define ERROR_DISPLAY 'N'///Symbol if grid was incorrectly populated
 //Command line arguments with defaults
-int burning=DEFUALT_BURN;      //percentage of population that is initially burning, modified by -bN argument
-int poc=DEFAULT_PROB_CATCH;    //Probability of catching fire, chance for each tree to catch fire, modified by -cN argument
-int occ=DEFAULT_DENSITY;       //proportion of simulation space that is occupied, modified by -dN argument
-int neigh=DEFAUT_PROB_NEIGHBOR;//Proportion of neighbors that above the tree may catch fire, modified by -nN argument
-int print=DEFAULT_PRINT_COUNT; //Toggles print mode, if >0, simulation will print that many iterations
-int size=DEFAULT_SIZE;         //size of the simulation grid's rows and columns. Grid will be size*size
-int damp=0;                    //Dampness factor reduces the likelyhood a tree will catch fire, initializes to 0 (off)
-int strike=0;                  //Toggles lightning strikes, which will set random trees on fire, initializes to 0 (off)
+static int burning=DEFUALT_BURN;      //percentage of population that is initially burning, modified by -bN argument
+static int poc=DEFAULT_PROB_CATCH;    //Probability of catching fire, chance for each tree to catch fire, modified by -cN argument
+static int occ=DEFAULT_DENSITY;       //proportion of simulation space that is occupied, modified by -dN argument
+static int neigh=DEFAUT_PROB_NEIGHBOR;//Proportion of neighbors that above the tree may catch fire, modified by -nN argument
+static int print=DEFAULT_PRINT_COUNT; //Toggles print mode, if >0, simulation will print that many iterations
+static int size=DEFAULT_SIZE;         //size of the simulation grid's rows and columns. Grid will be size*size
+static int damp=0;                    //Dampness factor reduces the likelyhood a tree will catch fire, initializes to 0 (off)
+static int strike=0;                  //Toggles lightning strikes, which will set random trees on fire, initializes to 0 (off)
 //Global Variables
-int Cycle=0;//Cycle the simulation is on
-int changes=0;//Changes this cycle
-int cumulativeChanges=0;//Total changes
+static int Cycle=0;//Cycle the simulation is on
+static int changes=0;//Changes this cycle
+static int cumulativeChanges=0;//Total changes
 ///////////////////////////////////////////////
 
 
@@ -247,7 +247,7 @@ void printGrid(char grid[size][size]){
       if(grid[i][j]==BURNT){//Burnt out cell
         printf(BURNT_DISPLAY);
       }
-      if(grid[i][j]==FIRE1 || grid[i][j]==FIRE2){//Cell on fire
+      if(grid[i][j]>TREE && grid[i][j ]< BURNT){//Cell on fire
         printf(FIRE_DISPLAY);
       }
       else{
@@ -294,6 +294,7 @@ void displayOverlay(char grid[size][size]){
     }
 
   }
+  set_cur_pos(size,0);//cursor right bellow output
 }
 /**Prints the usage message, for use when the user enters the H argument
 */
@@ -382,9 +383,50 @@ int main(int argc, char * argv[]){
           usage();
           return EXIT_FAILURE;
         }
+    }//end of switch
+  }//end of while
+
+  /////////////////////////////////////////////////
+  //Start of simulation
+  char grid[size][size];//allocate the grid
+  initialize(grid);//initialize the grid
+  if(print > 0){//Print output instead of display overlay
+    printGrid(grid);//print the initial state of the simulation
+    printInfo();//Print initial information
+    for(int i=0;i<print+1;i++){//Run for as many cycles as determined by arguments
+      usleep(750000);//wait
+      advance(grid);//Do a simulation cycle
+      cycle++;//increment cycle counter
+      printGrid(grid);//print the simulation
+      printInfo();//Print the cycle information
     }
+    return 1;
+    //END OF SIMULATION
   }
+  else{//Display overlay
+    int cont=1;//output of advance, 0 if end of game
+    displayOverlay(grid);//display initial state
+    printInfo();//Print initial info
+    while(cont!=0){//Simulation loop
+      usleep(750000);//wait
+      advance(grid);//Do a simulation cycle
+      cycle++;//Increment cycle counter
+      displayOverlay(grid);//Display the simulation
+      printInfo();//Print cycle information
+    }
+    printf("Fires are out.");//end of simulation print
+  }
+
 }
+
+
+
+
+
+
+
+
+
 
 
 
