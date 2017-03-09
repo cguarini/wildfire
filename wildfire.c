@@ -8,24 +8,33 @@
 #include <getopt.h> //processing for "-fN" command line args
 
 //defines
+//DEFUALTS
+#define DEFAULT_BURN 10
+#define DEFAULT_PROB_CATCH 30
+#define DEFAULT DENSITY 50
+#define DEFAULT_PROP_NEIGHBOR 25
+#define DEFAULT_PRINT_COUNT  0
+#define DEFAULT_SIZE 10
 #define TREE  1  //symbol for a noninflamed tree
 #define EMPTY 0  //Symbol for an empty cell
 #define FIRE1 2  //Symbol for fire in first cycle
 #define FIRE2 3  //Symbol for fire in second cycle
 #define BURNT 4  //Symbol for burnt out cell
 //Command line arguments with defaults
-int burning=15//percentage of population that is initially burning, modified by -bN argument
-int poc=60    //Probability of catching fire, chance for each tree to catch fire, modified by -cN argument
-int occ=75    //proportion of simulation space that is occupied, modified by -dN argument
-int neigh=50  //Proportion of neighbors that above the tree may catch fire, modified by -nN argument
-int print=0   //Toggles print mode, if >0, simulation will print that many iterations
-int size=15   //size of the simulation grid's rows and columns. Grid will be size*size
+int burning=DEFUALT_BURN;      //percentage of population that is initially burning, modified by -bN argument
+int poc=DEFAULT_PROB_CATCH;    //Probability of catching fire, chance for each tree to catch fire, modified by -cN argument
+int occ=DEFAULT_DENSITY;       //proportion of simulation space that is occupied, modified by -dN argument
+int neigh=DEFAUT_PROB_NEIGHBOR;//Proportion of neighbors that above the tree may catch fire, modified by -nN argument
+int print=DEFAULT_PRINT_COUNT; //Toggles print mode, if >0, simulation will print that many iterations
+int size=DEFAULT_SIZE;         //size of the simulation grid's rows and columns. Grid will be size*size
+int damp=0;                    //Dampness factor reduces the likelyhood a tree will catch fire, initializes to 0 (off)
+int strike=0;                  //Toggles lightning strikes, which will set random trees on fire, initializes to 0 (off)
 ///////////////////////////////////////////////
 
 
 
-/*Initializes the game board by populating it with trees
-**Will add trees randomly to the board until it is populated
+/*Initializes the game board by populating it with empty cells, trees amd fires
+**Will add trees and fires  randomly to the board until it is populated
 **to the proportion of the occ variable.
 **@param grid: The board to populate with trees.
 */
@@ -71,6 +80,133 @@ void initialize(char grid[size-1][size-1]){
   }
 //End initialize
 }
+
+/*Advances the grid one cycle, spreading fires and taking in to account
+**the variables set in the arguments. Creates a temporary copy of the grid,
+**so that changes during the current cycle don't effect other changes
+**as the program loops through the grid.
+**A cell with a 0 is empty, a cell with a 1 is a tree. For a tree on fire,
+**A cell can be 2 or 3, which corresponds to how many cycles it has been
+**on fire. A cell with a value of 4 has been burnt out.
+**@param: grid - Map of the simulation
+**@returns: Returns 1 if any fires left, 0 if all fires are out.
+*/
+int advance(char grid[size-1][size-1]{
+  char copy[size-1][size-1];//Copy of the simulation map
+  memcpy(copy,grid,size*size);//create the copy
+  int onFire=0;//Number of fires in the grid, if 0 triggers end of simulation.
+  for(int i=0;i<size;i++){//Loop through every row, top to bottom
+    for(int j=0;j<size;j++){//Loop through every column, left to right
+      int trees=0;//Number of adjacent trees
+      int fires=0;//Number of adjacent fires
+      if(copy[i][j]>1&&copy[i][j]<4){//Cell is burning but not burnt out
+        grid[i][j]++;//increment the fire a cycle
+        onFire++;
+      }
+      else if(copy[i][j]==1){//Cell holds a tree that is not on fire
+        
+        //Check adjacent cells starting at north and working clockwise
+        
+        //North
+        if(i>0){//if cell exists
+          if(copy[i-1][j]==TREE){//adjacent cell is a tree
+            trees++;//increment tree counter
+          }
+          if(copy[i-1][j]>TREE &&copy[i-1][j]<BURNT){//adjacent cell is on fire
+            fires++;//increment fire counter
+          }
+        }
+        
+        //North East
+        if(i>0&& j<size-1){//if cell exists
+          if(copy[i-1][j+1]==TREE){//adjacent cell is a tree
+            trees++;//increment tree counter
+          }
+          if(copy[i-1][j+1]>TREE &&copy[i-1][j]<BURNT){//adjacent cell is on fire
+            fires++;//increment fire counter
+          }
+        }
+
+        //East
+        if(j<size-1){//if cell exists
+          if(copy[i][j+1]==TREE){//adjacent cell is a tree
+            trees++;//increment tree counter
+          }
+          if(copy[i][j+1]>TREE &&copy[i-1][j]<BURNT){//adjacent cell is on fire
+            fires++;//increment fire counter
+          }
+        }
+
+        //South East
+        if(i<size-1 && j<size-1){//if cell exists
+          if(copy[i+1][j+1]==TREE){//adjacent cell is a tree
+            trees++;//increment tree counter
+          }
+          if(copy[i+1][j+1]>TREE &&copy[i-1][j]<BURNT){//adjacent cell is on fire
+            fires++;//increment fire counter
+          }
+        }
+        
+        //South
+        if(i<size-1){//if cell exists
+          if(copy[i+1][j]==TREE){//adjacent cell is a tree
+            trees++;//increment tree counter
+          }
+          if(copy[i+1][j]>TREE &&copy[i-1][j]<BURNT){//adjacent cell is on fire
+            fires++;//increment fire counter
+          }
+        }
+
+        //South West
+        if(i<size-1 && j>0){//if cell exists
+          if(copy[i+1][j-1]==TREE){//adjacent cell is a tree
+            trees++;//increment tree counter
+          }
+          if(copy[i+1][j-1]>TREE &&copy[i-1][j]<BURNT){//adjacent cell is on fire
+            fires++;//increment fire counter
+          }
+        }
+
+        //West
+        if(j>0){//if cell exists
+          if(copy[i][j-1]==TREE){//adjacent cell is a tree
+            trees++;//increment tree counter
+          }
+          if(copy[i][j-1]>TREE &&copy[i-1][j]<BURNT){//adjacent cell is on fire
+            fires++;//increment fire counter
+          }
+        }
+
+        //North West
+        if(i>0 && j>0){//if cell exists
+          if(copy[i-1][j-1]==TREE){//adjacent cell is a tree
+            trees++;//increment tree counter
+          }
+          if(copy[i-1][j-1]>TREE &&copy[i-1][j]<BURNT){//adjacent cell is on fire
+            fires++;//increment fire counter
+          }
+        }
+        //END CHECK
+      
+
+        int fireProportion = (trees+fires)/fires;//Proportion of neighbors on fire
+        int catchChance =rand()%100;//Random number between 1 and 100, used to check if tree will catch fire
+        if(fireProportion>neigh && catchChance<poc){
+          grid[i][j]++;//Tree catches fire
+          onFire++;//Add fire to the counter that determines end of game
+        }
+      }
+    }
+  }
+  //end of loops
+  if(onFire>0){
+    return 1;
+  }
+  return 0;
+}
+
+
+
 
 
 
