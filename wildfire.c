@@ -315,7 +315,75 @@ static void usage() {
 ** conditions.
 **/
 int main(int argc, char * argv[]){
-  
+  int opt;
+
+  while((opt=getopt(argc,argv,"H")) != -1){
+    switch( opt ) {
+      case 'H'://Help command
+        usage();
+        break;
+      case "bN"://set burning
+        burning = (int)strtol(optarg, NULL, 10);//set burning to value
+        if(burning > 0 && burning < 101){//check if in parameters
+          break;//all is good
+        }
+        else{//Bad input
+          fprintf(stderr, "\t(-bN) proportion already burning. must be an integer in [1...100].\n");
+          usage();//print usage
+          return EXIT_FAILURE;
+        }
+      case "cN"://probability to catch fire (poc)
+        poc = (int)strtol(optarg, NULL, 10);//set poc to value
+        if(poc > 0 && poc < 101){//check if withing parameters
+        break;//all is well
+        }
+        else{//Bad input
+          fprintf(stderr, "\t(-cN) probability a tree will catch fire. must be an integer in [1...100].\n");      
+          usage();//print usage information
+          return EXIT_FAILURE;
+        }
+      case "dN"://proportion of trees to grid size
+        occ= (int)strtol(optarg, NULL, 10);//set occ to value
+        if(occ > 0 && occ < 101){//within parameters
+          break;//all is fine
+        }
+        else{//not within parameters
+          fprintf(stderr, "\t(-dN) density of trees in the grid must be an integer in [1...100].\n");
+          usage();//usage info
+          return EXIT_FAILURE;
+        }
+      case "nN":
+        neigh= (int)strtol(optarg, NULL, 10);//set neigh to value
+        if(neigh > -1 && neigh < 101){//check if within parameters
+          break;//all is great
+        }
+        else{//all is not great
+          fprintf(stderr, "\t(-nN) neighbors influence catching fire must be an integer in [0...100].\n");
+          usage();//print help
+          return EXIT_FAILURE;
+        }
+       case "pN":
+        print= (int)strtol(optarg, NULL, 10);//set print to value
+        if(print > -1 && print < 10000){//within parameters
+          break;//all is spectacular
+        }
+        else{//all is not spectacular
+          fprintf(stderr, "\t(-pN) number of cycles to print. must be an integer in [0...10000].\n");
+          usage();
+          return EXIT_FAILURE;
+        }
+       case "sN":
+        size = (int)strtol(optarg, NULL, 10);//set size to value
+        if(size > 4 && size < 41){//within parameters
+          break;//all is okay
+        }
+        else{//all is not okay
+          fprintf(stderr, "\t(-sN) simulation grid size must be an integer in [5...40].\n");
+          usage();
+          return EXIT_FAILURE;
+        }
+    }
+  }
 }
 
 
