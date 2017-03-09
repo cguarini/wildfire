@@ -9,17 +9,23 @@
 
 //defines
 //DEFUALTS
-#define DEFAULT_BURN 10
-#define DEFAULT_PROB_CATCH 30
-#define DEFAULT DENSITY 50
-#define DEFAULT_PROP_NEIGHBOR 25
-#define DEFAULT_PRINT_COUNT  0
-#define DEFAULT_SIZE 10
-#define TREE  1  //symbol for a noninflamed tree
-#define EMPTY 0  //Symbol for an empty cell
-#define FIRE1 2  //Symbol for fire in first cycle
-#define FIRE2 3  //Symbol for fire in second cycle
-#define BURNT 4  //Symbol for burnt out cell
+#define DEFAULT_BURN 10 ///Proportion of trees initially burning
+#define DEFAULT_PROB_CATCH 30///Probability of a tree to catch fire
+#define DEFAULT DENSITY 50 ///Proportion of trees to empty cells on map
+#define DEFAULT_PROP_NEIGHBOR 25///Proportion of neighbors on fire to trigger prob_catch
+#define DEFAULT_PRINT_COUNT  0///Toggles if printing is on or off, default off
+#define DEFAULT_SIZE 10///Default size of 10x10 grid
+//Symbols used for backend grid only
+#define TREE  1  ///symbol for a noninflamed tree
+#define EMPTY 0  ///Symbol for an empty cell
+#define FIRE1 2  ///Symbol for fire in first cycle
+#define FIRE2 3  ///Symbol for fire in second cycle
+#define BURNT 4  ///Symbol for burnt out cell
+//Symbols used for display purposes
+#define TREE_DISPLAY 'Y' ///Symbol for noninflamed tree
+#define EMPTY_DISPLAY ' '///Symbol for empty cell
+#define FIRE_DISPLAY '*' ///Symbol for fire
+#define BURNT_DISPLAY '.'///Symbol for burnt out cell
 //Command line arguments with defaults
 int burning=DEFUALT_BURN;      //percentage of population that is initially burning, modified by -bN argument
 int poc=DEFAULT_PROB_CATCH;    //Probability of catching fire, chance for each tree to catch fire, modified by -cN argument
@@ -38,7 +44,7 @@ int strike=0;                  //Toggles lightning strikes, which will set rando
 **to the proportion of the occ variable.
 **@param grid: The board to populate with trees.
 */
-void initialize(char grid[size-1][size-1]){
+void initialize(char grid[size][size]){
   int cells=size*size;//total number of cells
   int numOfTrees=cells*occ/100;//Total number of trees
   int onFire=numOfTrees*burning/100;//Number of trees initially on fire
@@ -91,7 +97,7 @@ void initialize(char grid[size-1][size-1]){
 **@param: grid - Map of the simulation
 **@returns: Returns 1 if any fires left, 0 if all fires are out.
 */
-int advance(char grid[size-1][size-1]{
+int advance(char grid[size][size]{
   char copy[size-1][size-1];//Copy of the simulation map
   memcpy(copy,grid,size*size);//create the copy
   int onFire=0;//Number of fires in the grid, if 0 triggers end of simulation.
@@ -203,6 +209,34 @@ int advance(char grid[size-1][size-1]{
     return 1;
   }
   return 0;
+}
+
+
+/**Prints the grid to the terminal using stdio functions. Will display the grid
+** in a way that the terminal can scroll through each iteration.
+**@param: grid - grid to print to terminal
+**/
+void printGrid(char grid[size][size]){
+  printf("\n");//Start with new line
+  //Print the grid
+  for(int i=0; i<size;i++){//loop through grid from top to bottom
+    for(int j=0;j<size;j++){//left to right
+      if(grid[i][j]==EMPTY){//empty cell
+        printf(EMPTY_DISPLAY);
+      }
+      if(grid[i][j]==TREE){//tree in cell
+        printf(TREE_DISPLAY);
+      }
+      if(grid[i][j]==BURNT){//Burnt out cell
+        printf(BURNT_DISPLAY);
+      }
+      if(grid[i][j]==FIRE1 || grid[i][j]==FIRE2){//Cell on fire
+        printf(FIRE_DISPLAY);
+      }
+    }
+    printf("\n");//newline after every row
+  }
+  //Grid printed
 }
 
 
