@@ -1,7 +1,7 @@
 //file: wildfire.c
 //Simulates a wildfire using modified shiflet rules
 //author: Chris Guarini
-
+#define _BSD_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h> //used for usleep
@@ -39,8 +39,8 @@ static int occ=DEFAULT_DENSITY;       //proportion of simulation space that is o
 static int neigh=DEFAULT_PROB_NEIGHBOR;//Proportion of neighbors that above the tree may catch fire, modified by -nN argument
 static int print=DEFAULT_PRINT_COUNT; //Toggles print mode, if >0, simulation will print that many iterations
 static int size=DEFAULT_SIZE;         //size of the simulation grid's rows and columns. Grid will be size*size
-static int damp=0;                    //Dampness factor reduces the likelyhood a tree will catch fire, initializes to 0 (off)
-static int strike=0;                  //Toggles lightning strikes, which will set random trees on fire, initializes to 0 (off)
+//static int damp=0;                    //Dampness factor reduces the likelyhood a tree will catch fire, initializes to 0 (off)
+//static int strike=0;                  //Toggles lightning strikes, which will set random trees on fire, initializes to 0 (off)
 //Global Variables
 static int Cycle=0;//Cycle the simulation is on
 static int changes=0;//Changes this cycle
