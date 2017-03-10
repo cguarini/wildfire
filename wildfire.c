@@ -108,6 +108,8 @@ void initialize(char grid[size][size]){
 **@returns: Returns 1 if any fires left, 0 if all fires are out.
 */
 int advance(char grid[size][size]){
+  char copy[size][size];
+  memcpy(copy,grid,(size*size));//Create a copy of the grid, so that new fires don't effect the current cycle
   changes=0;//reset changes
   int onFire=0;//Number of fires in the grid, if 0 triggers end of simulation.
   for(int i=0;i<size;i++){//Loop through every row, top to bottom
@@ -132,80 +134,80 @@ int advance(char grid[size][size]){
         
         //North
         if(i>0){//if cell exists
-          if(grid[i-1][j]==TREE){//adjacent cell is a tree
+          if(copy[i-1][j]==TREE){//adjacent cell is a tree
             trees++;//increment tree counter
           }
-          if(grid[i-1][j]>TREE &&grid[i-1][j]<BURNT){//adjacent cell is on fire
+          if(copy[i-1][j]>TREE &&copy[i-1][j]<BURNT){//adjacent cell is on fire
             fires++;//increment fire counter
           }
         }
         
         //North East
         if(i>0&& j<size-1){//if cell exists
-          if(grid[i-1][j+1]==TREE){//adjacent cell is a tree
+          if(copy[i-1][j+1]==TREE){//adjacent cell is a tree
             trees++;//increment tree counter
           }
-          if(grid[i-1][j+1]>TREE &&grid[i-1][j]<BURNT){//adjacent cell is on fire
+          if(copy[i-1][j+1]>TREE &&copy[i-1][j+1]<BURNT){//adjacent cell is on fire
             fires++;//increment fire counter
           }
         }
 
         //East
         if(j<size-1){//if cell exists
-          if(grid[i][j+1]==TREE){//adjacent cell is a tree
+          if(copy[i][j+1]==TREE){//adjacent cell is a tree
             trees++;//increment tree counter
           }
-          if(grid[i][j+1]>TREE &&grid[i-1][j]<BURNT){//adjacent cell is on fire
+          if(copy[i][j+1]>TREE &&copy[i][j+1]<BURNT){//adjacent cell is on fire
             fires++;//increment fire counter
           }
         }
 
         //South East
         if(i<size-1 && j<size-1){//if cell exists
-          if(grid[i+1][j+1]==TREE){//adjacent cell is a tree
+          if(copy[i+1][j+1]==TREE){//adjacent cell is a tree
             trees++;//increment tree counter
           }
-          if(grid[i+1][j+1]>TREE &&grid[i-1][j]<BURNT){//adjacent cell is on fire
+          if(copy[i+1][j+1]>TREE &&copy[i+1][j+1]<BURNT){//adjacent cell is on fire
             fires++;//increment fire counter
           }
         }
         
         //South
         if(i<size-1){//if cell exists
-          if(grid[i+1][j]==TREE){//adjacent cell is a tree
+          if(copy[i+1][j]==TREE){//adjacent cell is a tree
             trees++;//increment tree counter
           }
-          if(grid[i+1][j]>TREE &&grid[i-1][j]<BURNT){//adjacent cell is on fire
+          if(copy[i+1][j]>TREE &&copy[i+1][j]<BURNT){//adjacent cell is on fire
             fires++;//increment fire counter
           }
         }
 
         //South West
         if(i<size-1 && j>0){//if cell exists
-          if(grid[i+1][j-1]==TREE){//adjacent cell is a tree
+          if(copy[i+1][j-1]==TREE){//adjacent cell is a tree
             trees++;//increment tree counter
           }
-          if(grid[i+1][j-1]>TREE &&grid[i-1][j]<BURNT){//adjacent cell is on fire
+          if(copy[i+1][j-1]>TREE &&copy[i+1][j-1]<BURNT){//adjacent cell is on fire
             fires++;//increment fire counter
           }
         }
 
         //West
         if(j>0){//if cell exists
-          if(grid[i][j-1]==TREE){//adjacent cell is a tree
+          if(copy[i][j-1]==TREE){//adjacent cell is a tree
             trees++;//increment tree counter
           }
-          if(grid[i][j-1]>TREE &&grid[i-1][j]<BURNT){//adjacent cell is on fire
+          if(copy[i][j-1]>TREE &&copy[i][j-1]<BURNT){//adjacent cell is on fire
             fires++;//increment fire counter
           }
         }
 
         //North West
         if(i>0 && j>0){//if cell exists
-          if(grid[i-1][j-1]==TREE){//adjacent cell is a tree
+          if(copy[i-1][j-1]==TREE){//adjacent cell is a tree
             trees++;//increment tree counter
           }
-          if(grid[i-1][j-1]>TREE &&grid[i-1][j]<BURNT){//adjacent cell is on fire
+          if(copy[i-1][j-1]>TREE &&copy[i-1][j-1]<BURNT){//adjacent cell is on fire
             fires++;//increment fire counter
           }
         }
@@ -213,11 +215,11 @@ int advance(char grid[size][size]){
 
         float fireProportion=0;
         if(fires>0){//So that it doesn't divide by zero
-          fireProportion =(float) (trees+fires)/fires;//Proportion of neighbors on fire
+          fireProportion =(float) fires/(trees+fires);//Proportion of neighbors on fire
         }
         float neighProp=(float)neigh/100;
         int catchChance =rand()%100;//Random number between 1 and 100, used to check if tree will catch fire
-        if(fireProportion>neighProp/100 && catchChance<poc){
+        if(fireProportion>neighProp && catchChance<poc){
           grid[i][j]++;//Tree catches fire
           onFire++;//Add fire to the counter that determines end of game
           //increment change counters
@@ -435,6 +437,9 @@ int main(int argc, char * argv[]){
     while(cont!=0){//Simulation loop
       usleep(750000);//wait
       cont=advance(grid);//Do a simulation cycle
+      if(cont==0){//End of simulation
+        break;
+      }
       Cycle++;//Increment cycle counter
       displayOverlay(grid);//Display the simulation
       printInfo();//Print cycle informatioin
